@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-in-One Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: #4a6fa5;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .mode-selector {
+            display: flex;
+            margin-top: 15px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 5px;
+            justify-content: center;
+        }
+        
+        .mode-btn {
+            background: none;
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .mode-btn.active {
+            background-color: white;
+            color: #4a6fa5;
+        }
+        
+        .calculator {
+            padding: 20px;
+        }
+        
+        .display {
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            text-align: right;
+            font-size: 28px;
+            font-weight: 500;
+            overflow: hidden;
+            min-height: 40px;
+            position: relative;
+        }
+        
+        .display .previous-operation {
+            position: absolute;
+            top: 5px;
+            right: 15px;
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .display .current-input {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        
+        button {
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .num, .decimal {
+            background-color: #f8f9fa;
+            color: #333;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .operator, .equals {
+            background-color: #4a6fa5;
+            color: white;
+            box-shadow: 0 4px 6px rgba(74, 111, 165, 0.3);
+        }
+        
+        .clear, .delete, .percent {
+            background-color: #e2a83e;
+            color: white;
+            box-shadow: 0 4px 6px rgba(226, 168, 62, 0.3);
+        }
+        
+        .zero {
+            grid-column: span 2;
+        }
+        
+        .sci-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .sci-btn {
+            background-color: #f8f9fa;
+            color: #333;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+        
+        .sci-btn:hover {
+            transform: translateY(-3px);
+            background-color: #e9ecef;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: #666;
+            font-size: 14px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>All-in-One Calculator</h1>
+            <div class="mode-selector">
+                <button class="mode-btn active" id="standard-btn">Standard</button>
+                <button class="mode-btn" id="scientific-btn">Scientific</button>
+            </div>
+        </header>
+        
+        <div class="calculator">
+            <div class="display">
+                <div class="previous-operation"></div>
+                <div class="current-input">0</div>
+            </div>
+            
+            <!-- Standard Calculator -->
+            <div id="standard-calculator">
+                <div class="buttons">
+                    <button class="clear">C</button>
+                    <button class="percent">%</button>
+                    <button class="delete">⌫</button>
+                    <button class="operator">÷</button>
+                    
+                    <button class="num">7</button>
+                    <button class="num">8</button>
+                    <button class="num">9</button>
+                    <button class="operator">×</button>
+                    
+                    <button class="num">4</button>
+                    <button class="num">5</button>
+                    <button class="num">6</button>
+                    <button class="operator">-</button>
+                    
+                    <button class="num">1</button>
+                    <button class="num">2</button>
+                    <button class="num">3</button>
+                    <button class="operator">+</button>
+                    
+                    <button class="num zero">0</button>
+                    <button class="decimal">.</button>
+                    <button class="equals">=</button>
+                </div>
+            </div>
+            
+            <!-- Scientific Calculator (hidden by default) -->
+            <div id="scientific-calculator" class="hidden">
+                <div class="sci-buttons">
+                    <button class="sci-btn">sin</button>
+                    <button class="sci-btn">cos</button>
+                    <button class="sci-btn">tan</button>
+                    <button class="sci-btn">x²</button>
+                    
+                    <button class="sci-btn">√</button>
+                    <button class="sci-btn">x³</button>
+                    <button class="sci-btn">xʸ</button>
+                    <button class="sci-btn">log</button>
+                    
+                    <button class="sci-btn">ln</button>
+                    <button class="sci-btn">(</button>
+                    <button class="sci-btn">)</button>
+                    <button class="sci-btn">π</button>
+                    
+                    <button class="sci-btn">e</button>
+                    <button class="sci-btn">n!</button>
+                    <button class="sci-btn">|x|</button>
+                    <button class="sci-btn">1/x</button>
+                </div>
+                
+                <div class="buttons" style="margin-top: 15px;">
+                    <button class="clear">C</button>
+                    <button class="percent">%</button>
+                    <button class="delete">⌫</button>
+                    <button class="operator">÷</button>
+                    
+                    <button class="num">7</button>
+                    <button class="num">8</button>
+                    <button class="num">9</button>
+                    <button class="operator">×</button>
+                    
+                    <button class="num">4</button>
+                    <button class="num">5</button>
+                    <button class="num">6</button>
+                    <button class="operator">-</button>
+                    
+                    <button class="num">1</button>
+                    <button class="num">2</button>
+                    <button class="num">3</button>
+                    <button class="operator">+</button>
+                    
+                    <button class="num zero">0</button>
+                    <button class="decimal">.</button>
+                    <button class="equals">=</button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            © 2025 All-in-One Calculator | Created by Rudra Madhab Sahoo
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Calculator elements
+            const currentDisplay = document.querySelector('.current-input');
+            const previousDisplay = document.querySelector('.previous-operation');
+            const calculator = document.querySelector('.calculator');
+            
+            // Mode buttons
+            const standardBtn = document.getElementById('standard-btn');
+            const scientificBtn = document.getElementById('scientific-btn');
+            const standardCalc = document.getElementById('standard-calculator');
+            const scientificCalc = document.getElementById('scientific-calculator');
+            
+            // Calculator state
+            let currentInput = '0';
+            let previousInput = '';
+            let operation = null;
+            let resetOnNextInput = false;
+            
+            // Mode switching
+            standardBtn.addEventListener('click', () => {
+                standardBtn.classList.add('active');
+                scientificBtn.classList.remove('active');
+                standardCalc.classList.remove('hidden');
+                scientificCalc.classList.add('hidden');
+                clearAll();
+            });
+            
+            scientificBtn.addEventListener('click', () => {
+                scientificBtn.classList.add('active');
+                standardBtn.classList.remove('active');
+                scientificCalc.classList.remove('hidden');
+                standardCalc.classList.add('hidden');
+                clearAll();
+            });
+            
+            // Number buttons
+            calculator.querySelectorAll('.num').forEach(button => {
+                button.addEventListener('click', () => {
+                    inputNumber(button.textContent);
+                    updateDisplay();
+                });
+            });
+            
+            // Decimal button
+            calculator.querySelector('.decimal').addEventListener('click', () => {
+                inputDecimal();
+                updateDisplay();
+            });
+            
+            // Operator buttons
+            calculator.querySelectorAll('.operator').forEach(button => {
+                button.addEventListener('click', () => {
+                    inputOperator(button.textContent);
+                    updateDisplay();
+                });
+            });
+            
+            // Clear button
+            calculator.querySelector('.clear').addEventListener('click', () => {
+                clearAll();
+                updateDisplay();
+            });
+            
+            // Delete button
+            calculator.querySelector('.delete').addEventListener('click', () => {
+                deleteLastChar();
+                updateDisplay();
+            });
+            
+            // Percent button
+            calculator.querySelector('.percent').addEventListener('click', () => {
+                calculatePercent();
+                updateDisplay();
+            });
+            
+            // Equals button
+            calculator.querySelector('.equals').addEventListener('click', () => {
+                calculate();
+                updateDisplay();
+            });
+            
+            // Scientific buttons
+            calculator.querySelectorAll('.sci-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    handleScientificFunction(button.textContent);
+                    updateDisplay();
+                });
+            });
+            
+            // Keyboard support
+            document.addEventListener('keydown', handleKeyboardInput);
+            
+            // Update display
+            function updateDisplay() {
+                currentDisplay.textContent = currentInput;
+                previousDisplay.textContent = operation ? `${previousInput} ${operation}` : '';
+            }
+            
+            // Input number
+            function inputNumber(number) {
+                if (currentInput === '0' || resetOnNextInput) {
+                    currentInput = number;
+                    resetOnNextInput = false;
+                } else {
+                    // Prevent multiple leading zeros
+                    if (currentInput === '0' && number === '0') return;
+                    
+                    // Limit display length
+                    if (currentInput.length < 12) {
+                        currentInput += number;
+                    }
+                }
+            }
+            
+            // Input decimal
+            function inputDecimal() {
+                if (resetOnNextInput) {
+                    currentInput = '0.';
+                    resetOnNextInput = false;
+                    return;
+                }
+                
+                if (!currentInput.includes('.')) {
+                    currentInput += '.';
+                }
+            }
+            
+            // Input operator
+            function inputOperator(op) {
+                if (currentInput === '0' && previousInput === '') return;
+                
+                if (previousInput !== '') {
+                    calculate();
+                }
+                
+                operation = op;
+                previousInput = currentInput;
+                resetOnNextInput = true;
+            }
+            
+            // Clear all
+            function clearAll() {
+                currentInput = '0';
+                previousInput = '';
+                operation = null;
+                resetOnNextInput = false;
+            }
+            
+            // Delete last character
+            function deleteLastChar() {
+                if (currentInput.length === 1 || (currentInput.length === 2 && currentInput.startsWith('-'))) {
+                    currentInput = '0';
+                } else {
+                    currentInput = currentInput.slice(0, -1);
+                }
+            }
+            
+            // Calculate percent
+            function calculatePercent() {
+                currentInput = (parseFloat(currentInput) / 100).toString();
+            }
+            
+            // Calculate result
+            function calculate() {
+                if (previousInput === '' || operation === null) return;
+                
+                const prev = parseFloat(previousInput);
+                const current = parseFloat(currentInput);
+                let result;
+                
+                switch (operation) {
+                    case '+':
+                        result = prev + current;
+                        break;
+                    case '-':
+                        result = prev - current;
+                        break;
+                    case '×':
+                        result = prev * current;
+                        break;
+                    case '÷':
+                        if (current === 0) {
+                            result = 'Error';
+                        } else {
+                            result = prev / current;
+                        }
+                        break;
+                    default:
+                        return;
+                }
+                
+                // Format result
+                if (result !== 'Error') {
+                    // Limit decimal places
+                    result = Math.round(result * 1000000000) / 1000000000;
+                    result = result.toString();
+                }
+                
+                currentInput = result;
+                operation = null;
+                previousInput = '';
+                resetOnNextInput = true;
+            }
+            
+            // Handle scientific functions
+            function handleScientificFunction(func) {
+                const currentValue = parseFloat(currentInput);
+                let result;
+                
+                switch (func) {
+                    case 'sin':
+                        result = Math.sin(currentValue * Math.PI / 180); // Convert degrees to radians
+                        break;
+                    case 'cos':
+                        result = Math.cos(currentValue * Math.PI / 180);
+                        break;
+                    case 'tan':
+                        result = Math.tan(currentValue * Math.PI / 180);
+                        break;
+                    case '√':
+                        if (currentValue < 0) {
+                            result = 'Error';
+                        } else {
+                            result = Math.sqrt(currentValue);
+                        }
+                        break;
+                    case 'x²':
+                        result = currentValue * currentValue;
+                        break;
+                    case 'x³':
+                        result = currentValue * currentValue * currentValue;
+                        break;
+                    case 'log':
+                        if (currentValue <= 0) {
+                            result = 'Error';
+                        } else {
+                            result = Math.log10(currentValue);
+                        }
+                        break;
+                    case 'ln':
+                        if (currentValue <= 0) {
+                            result = 'Error';
+                        } else {
+                            result = Math.log(currentValue);
+                        }
+                        break;
+                    case 'π':
+                        result = Math.PI;
+                        break;
+                    case 'e':
+                        result = Math.E;
+                        break;
+                    case 'n!':
+                        if (currentValue < 0 || !Number.isInteger(currentValue)) {
+                            result = 'Error';
+                        } else {
+                            result = factorial(currentValue);
+                        }
+                        break;
+                    case '|x|':
+                        result = Math.abs(currentValue);
+                        break;
+                    case '1/x':
+                        if (currentValue === 0) {
+                            result = 'Error';
+                        } else {
+                            result = 1 / currentValue;
+                        }
+                        break;
+                    case 'xʸ':
+                        operation = '^';
+                        previousInput = currentInput;
+                        resetOnNextInput = true;
+                        return;
+                    case '(':
+                        if (currentInput === '0') {
+                            currentInput = '(';
+                        } else {
+                            previousInput = currentInput;
+                            operation = '*(';
+                        }
+                        resetOnNextInput = true;
+                        return;
+                    case ')':
+                        if (previousInput && operation === '*(') {
+                            currentInput = ')';
+                            calculateWithParentheses();
+                        }
+                        return;
+                    default:
+                        return;
+                }
+                
+                // Format result
+                if (result !== 'Error') {
+                    result = Math.round(result * 1000000000) / 1000000000;
+                    currentInput = result.toString();
+                } else {
+                    currentInput = result;
+                }
+                
+                resetOnNextInput = true;
+            }
+            
+            // Calculate with parentheses
+            function calculateWithParentheses() {
+                const prev = parseFloat(previousInput);
+                const current = parseFloat(currentInput.slice(0, -1)); // Remove the closing parenthesis
+                
+                // For simplicity, we're just multiplying here
+                // A full implementation would require parsing the expression
+                currentInput = (prev * current).toString();
+                previousInput = '';
+                operation = null;
+            }
+            
+            // Calculate factorial
+            function factorial(n) {
+                if (n === 0 || n === 1) return 1;
+                let result = 1;
+                for (let i = 2; i <= n; i++) {
+                    result *= i;
+                }
+                return result;
+            }
+            
+            // Handle keyboard input
+            function handleKeyboardInput(e) {
+                // Number keys
+                if (/[0-9]/.test(e.key)) {
+                    document.querySelector(`button:contains('${e.key}')`).click();
+                }
+                // Operator keys
+                else if (e.key === '+') {
+                    document.querySelector('button.operator:nth-child(16)').click();
+                }
+                else if (e.key === '-') {
+                    document.querySelector('button.operator:nth-child(12)').click();
+                }
+                else if (e.key === '*') {
+                    document.querySelector('button.operator:nth-child(8)').click();
+                }
+                else if (e.key === '/') {
+                    e.preventDefault();
+                    document.querySelector('button.operator:nth-child(4)').click();
+                }
+                else if (e.key === '.') {
+                    document.querySelector('.decimal').click();
+                }
+                else if (e.key === 'Enter' || e.key === '=') {
+                    document.querySelector('.equals').click();
+                }
+                else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') {
+                    document.querySelector('.clear').click();
+                }
+                else if (e.key === 'Backspace') {
+                    document.querySelector('.delete').click();
+                }
+            }
+            
+            // Add :contains pseudo-selector for buttons (for keyboard support)
+            // This is a simple implementation for this specific use case
+            Object.defineProperty(Element.prototype, 'textContent', {
+                set: function(text) {
+                    this.setAttribute('data-text', text);
+                    this.innerText = text;
+                },
+                get: function() {
+                    return this.getAttribute('data-text') || this.innerText;
+                }
+            });
+            
+            // Initialize display
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>
